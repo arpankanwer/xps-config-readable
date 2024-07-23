@@ -7,40 +7,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import { styled } from "@mui/material/styles";
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  width: "100%",
-  overflow: "hidden",
-  padding: theme.spacing(2),
-  textAlign: "center",
-}));
-
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  maxHeight: 440,
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(1),
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  width: "300px",
-  margin: theme.spacing(1),
-  borderRadius: "25px", // Rounded corners
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "25px", // Rounded corners for the input field
-  },
-}));
-
-const RecordCount = styled(Typography)(({ theme }) => ({
-  margin: theme.spacing(1),
-  textAlign: "left",
-}));
+import "../styles/SearchConfig.css"; // Import the CSS file
 
 const SearchConfig = () => {
   const [query, setQuery] = useState("");
@@ -48,7 +15,8 @@ const SearchConfig = () => {
   const [xpsDataset, setXpsDataset] = useState([]);
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [noData, setNoData] = useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [file, setFile] = useState(null);
 
   useEffect(() => {
@@ -75,6 +43,8 @@ const SearchConfig = () => {
           });
 
           setConfigs(configList);
+          setQuery("");
+          setTimeout(handleSearch, 100);
         };
         reader.readAsText(file);
       }
@@ -90,94 +60,60 @@ const SearchConfig = () => {
     return `[${idx}]`;
   };
 
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  const formatParamValue = (dataset, configData) => {
+    return typeof dataset["value"] === "string"
+      ? dataset["value"]
+      : dataset["value"][configData["val"]] + " (" + configData["val"] + ")";
+  };
+
+  const processConfigData = (configData, dataset) => {
+    if (configData["var"] === dataset["variable_id"]) {
+      const paramValue = formatParamValue(dataset, configData);
+      const idxDisplay = formatIdx(configData["idx"]);
+
+      return {
+        var: configData["var"],
+        name: dataset["name"],
+        idx: idxDisplay,
+        value: capitalizeFirstLetter(paramValue),
+        attr: configData["attr"],
+      };
+    }
+    return null;
+  };
+
   const handleSearch = () => {
     let z = 0;
     const filteredResults = [];
 
-    if (query === "") {
-      configs.forEach((configData) => {
-        xpsDataset.forEach((dataset) => {
-          if (configData["var"] === dataset["variable_id"]) {
-            z++;
-            const paramValue =
-              typeof dataset["value"] === "string"
-                ? dataset["value"]
-                : dataset["value"][configData["val"]] +
-                  " (" +
-                  configData["val"] +
-                  ")";
-            const idxDisplay = formatIdx(configData["idx"]);
-
-            filteredResults.push({
-              var: configData["var"],
-              name: dataset["name"],
-              idx: idxDisplay,
-              value: paramValue,
-              attr: configData["attr"],
-            });
+    configs.forEach((configData) => {
+      xpsDataset.forEach((dataset) => {
+        let result = null;
+        if (query === "") {
+          result = processConfigData(configData, dataset);
+        } else if (!isNaN(query)) {
+          if (parseInt(query) === configData["var"]) {
+            result = processConfigData(configData, dataset);
           }
-        });
-      });
-    } else if (!isNaN(query)) {
-      configs.forEach((configData) => {
-        xpsDataset.forEach((dataset) => {
-          if (
-            parseInt(query) === configData["var"] &&
-            configData["var"] === dataset["variable_id"]
-          ) {
-            z++;
-            const paramValue =
-              typeof dataset["value"] === "string"
-                ? dataset["value"]
-                : dataset["value"][configData["val"]] +
-                  " (" +
-                  configData["val"] +
-                  ")";
-            const idxDisplay = formatIdx(configData["idx"]);
-
-            filteredResults.push({
-              var: configData["var"],
-              name: dataset["name"],
-              idx: idxDisplay,
-              value: paramValue,
-              attr: configData["attr"],
-            });
+        } else {
+          if (dataset["name"].toLowerCase().includes(query.toLowerCase())) {
+            result = processConfigData(configData, dataset);
           }
-        });
-      });
-    } else {
-      configs.forEach((configData) => {
-        xpsDataset.forEach((dataset) => {
-          if (
-            dataset["name"].toLowerCase().includes(query.toLowerCase()) &&
-            configData["var"] === dataset["variable_id"]
-          ) {
-            z++;
-            const paramValue =
-              typeof dataset["value"] === "string"
-                ? dataset["value"]
-                : dataset["value"][configData["val"]] +
-                  " (" +
-                  configData["val"] +
-                  ")";
-            const idxDisplay = formatIdx(configData["idx"]);
+        }
 
-            filteredResults.push({
-              var: configData["var"],
-              name: dataset["name"],
-              idx: idxDisplay,
-              value: paramValue,
-              attr: configData["attr"],
-            });
-          }
-        });
+        if (result) {
+          z++;
+          filteredResults.push(result);
+        }
       });
-    }
+    });
 
     setResults(filteredResults);
-    if (z === 0) {
-      console.log("NO DATA FOUND");
-    }
+    setNoData(z === 0);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -190,7 +126,9 @@ const SearchConfig = () => {
   };
 
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
+    if (event.target.files.length > 0) {
+      setFile(event.target.files[0]);
+    }
   };
 
   const handleKeyDown = (event) => {
@@ -200,86 +138,75 @@ const SearchConfig = () => {
   };
 
   return (
-    <StyledPaper>
-      <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-        <Typography variant="h5" gutterBottom>
-          XPS Config Search
-        </Typography>
-        <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
-          <StyledTextField
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Enter variable ID or name"
-            variant="outlined"
-          />
-          <StyledButton
-            variant="contained"
-            color="primary"
-            onClick={handleSearch}
-          >
-            Search
-          </StyledButton>
+    <div className="container">
+      <h3 className="header">XPS Config Search</h3>
+      <div className="search-container">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Enter variable ID or name"
+          className="search-input"
+        />
+        <button onClick={handleSearch} className="search-button">
+          Search
+        </button>
+        <label htmlFor="upload-file" className="upload-button">
+          Upload Config
           <input
             accept=".json"
             id="upload-file"
             type="file"
-            style={{ display: "none" }}
+            className="upload-file-input"
             onChange={handleFileChange}
           />
-          <label htmlFor="upload-file">
-            <StyledButton
-              variant="contained"
-              color="secondary"
-              component="span"
-            >
-              Upload Config
-            </StyledButton>
-          </label>
-        </Box>
-        {file && (
-          <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-            Uploaded File: {file.name}
-          </Typography>
+        </label>
+      </div>
+      {file && (
+        <p className="uploaded-file">
+          Uploaded File: {file.name} (Records: {results.length})
+          {/* <div className="records-coun">
+            <span>Records: {results.length}</span>
+          </div> */}
+        </p>
+      )}
+      <Paper style={{ width: "100%", overflow: "hidden" }}>
+        {noData ? (
+          <div className="no-data">
+            <h2>No Data Found</h2>
+          </div>
+        ) : (
+          <TableContainer style={{ maxHeight: 440 }}>
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>No.</TableCell>
+                  <TableCell>Var</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Idx</TableCell>
+                  <TableCell>Value</TableCell>
+                  <TableCell>Attr</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {results
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((result, index) => (
+                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                      <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                      <TableCell>{result.var}</TableCell>
+                      <TableCell>{result.name}</TableCell>
+                      <TableCell>{result.idx}</TableCell>
+                      <TableCell>{result.value}</TableCell>
+                      <TableCell>{result.attr}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
-        <StyledTableContainer>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <RecordCount variant="subtitle1" color="textSecondary">
-              Records: {results.length}
-            </RecordCount>
-          </Box>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Id</TableCell> {/* Row number column */}
-                <TableCell>Var</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Idx</TableCell>
-                <TableCell>Value</TableCell>
-                <TableCell>Attr</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {results
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((result, index) => (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>{" "}
-                    {/* Row number */}
-                    <TableCell>{result.var}</TableCell>
-                    <TableCell>{result.name}</TableCell>
-                    <TableCell>{result.idx}</TableCell>
-                    <TableCell>{result.value}</TableCell>
-                    <TableCell>{result.attr}</TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </StyledTableContainer>
+      </Paper>
+      <div className="footer-class">
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
@@ -289,8 +216,8 @@ const SearchConfig = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Box>
-    </StyledPaper>
+      </div>
+    </div>
   );
 };
 
