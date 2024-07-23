@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { styled } from "@mui/material/styles";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  width: '100%',
-  overflow: 'hidden',
+  width: "100%",
+  overflow: "hidden",
   padding: theme.spacing(2),
-  textAlign: 'center',
+  textAlign: "center",
 }));
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
@@ -29,17 +29,17 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
-  width: '300px',
+  width: "300px",
   margin: theme.spacing(1),
-  borderRadius: '25px',  // Rounded corners
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '25px',  // Rounded corners for the input field
+  borderRadius: "25px", // Rounded corners
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "25px", // Rounded corners for the input field
   },
 }));
 
 const RecordCount = styled(Typography)(({ theme }) => ({
   margin: theme.spacing(1),
-  textAlign: 'left',
+  textAlign: "left",
 }));
 
 const SearchConfig = () => {
@@ -83,6 +83,13 @@ const SearchConfig = () => {
     fetchData();
   }, [file]);
 
+  const formatIdx = (idx) => {
+    if (Array.isArray(idx)) {
+      return `[${idx.join(", ")}]`;
+    }
+    return `[${idx}]`;
+  };
+
   const handleSearch = () => {
     let z = 0;
     const filteredResults = [];
@@ -99,10 +106,12 @@ const SearchConfig = () => {
                   " (" +
                   configData["val"] +
                   ")";
+            const idxDisplay = formatIdx(configData["idx"]);
+
             filteredResults.push({
               var: configData["var"],
               name: dataset["name"],
-              idx: configData["idx"],
+              idx: idxDisplay,
               value: paramValue,
               attr: configData["attr"],
             });
@@ -124,10 +133,12 @@ const SearchConfig = () => {
                   " (" +
                   configData["val"] +
                   ")";
+            const idxDisplay = formatIdx(configData["idx"]);
+
             filteredResults.push({
               var: configData["var"],
               name: dataset["name"],
-              idx: dataset["idx"],
+              idx: idxDisplay,
               value: paramValue,
               attr: configData["attr"],
             });
@@ -149,10 +160,12 @@ const SearchConfig = () => {
                   " (" +
                   configData["val"] +
                   ")";
+            const idxDisplay = formatIdx(configData["idx"]);
+
             filteredResults.push({
               var: configData["var"],
               name: dataset["name"],
-              idx: dataset["idx"],
+              idx: idxDisplay,
               value: paramValue,
               attr: configData["attr"],
             });
@@ -181,7 +194,7 @@ const SearchConfig = () => {
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSearch();
     }
   };
@@ -200,18 +213,26 @@ const SearchConfig = () => {
             placeholder="Enter variable ID or name"
             variant="outlined"
           />
-          <StyledButton variant="contained" color="primary" onClick={handleSearch}>
+          <StyledButton
+            variant="contained"
+            color="primary"
+            onClick={handleSearch}
+          >
             Search
           </StyledButton>
           <input
             accept=".json"
             id="upload-file"
             type="file"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             onChange={handleFileChange}
           />
           <label htmlFor="upload-file">
-            <StyledButton variant="contained" color="secondary" component="span">
+            <StyledButton
+              variant="contained"
+              color="secondary"
+              component="span"
+            >
               Upload Config
             </StyledButton>
           </label>
@@ -222,7 +243,11 @@ const SearchConfig = () => {
           </Typography>
         )}
         <StyledTableContainer>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <RecordCount variant="subtitle1" color="textSecondary">
               Records: {results.length}
             </RecordCount>
@@ -230,6 +255,7 @@ const SearchConfig = () => {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
+                <TableCell>Id</TableCell> {/* Row number column */}
                 <TableCell>Var</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Idx</TableCell>
@@ -238,15 +264,19 @@ const SearchConfig = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {results.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((result, index) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                  <TableCell>{result.var}</TableCell>
-                  <TableCell>{result.name}</TableCell>
-                  <TableCell>{result.idx}</TableCell>
-                  <TableCell>{result.value}</TableCell>
-                  <TableCell>{result.attr}</TableCell>
-                </TableRow>
-              ))}
+              {results
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((result, index) => (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>{" "}
+                    {/* Row number */}
+                    <TableCell>{result.var}</TableCell>
+                    <TableCell>{result.name}</TableCell>
+                    <TableCell>{result.idx}</TableCell>
+                    <TableCell>{result.value}</TableCell>
+                    <TableCell>{result.attr}</TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </StyledTableContainer>
