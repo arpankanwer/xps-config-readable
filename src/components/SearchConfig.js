@@ -136,20 +136,21 @@ const SearchConfig = () => {
       if (event.target.files[0].type === "application/json") {
         const reader = new FileReader();
         reader.onload = (e) => {
-        try {
-          const xpsConfigData = JSON.parse(e.target.result);
+          try {
+            const xpsConfigData = JSON.parse(e.target.result);
 
-          if (!xpsConfigData.config) {
-            alert("Invalid JSON format. Missing 'config' parameter.");
-          } else {
-            setFile(event.target.files[0]);
+            if (!xpsConfigData.config) {
+              alert("Invalid JSON format. Missing 'config' parameter.");
+            } else {
+              setFile(event.target.files[0]);
+            }
+          } catch (error) {
+            alert(
+              "Failed to parse JSON. Please ensure the file is valid JSON."
+            );
           }
-        } catch (error) {
-          alert("Failed to parse JSON. Please ensure the file is valid JSON.");
-        }
-      };
-      reader.readAsText(event.target.files[0]);
-   
+        };
+        reader.readAsText(event.target.files[0]);
       } else {
         alert("File type not supported (JSON file required)");
       }
@@ -200,15 +201,23 @@ const SearchConfig = () => {
             </div>
           ) : (
             <TableContainer className="table-container">
-              <Table stickyHeader aria-label="sticky table">
+              <Table
+                stickyHeader
+                aria-label="sticky table"
+                sx={{
+                  "& .MuiTableCell-sizeMedium": {
+                    padding: "12px 16px",
+                  },
+                }}
+              >
                 <TableHead>
                   <TableRow>
-                    <TableCell>No.</TableCell>
-                    <TableCell>Var</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Idx</TableCell>
-                    <TableCell>Value</TableCell>
-                    <TableCell>Attr</TableCell>
+                    <TableCell className="table-cell">No.</TableCell>
+                    <TableCell className="table-cell">Var</TableCell>
+                    <TableCell className="table-cell">Name</TableCell>
+                    <TableCell className="table-cell">Idx</TableCell>
+                    <TableCell className="table-cell">Value</TableCell>
+                    <TableCell className="table-cell">Attr</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody className="table-body">
@@ -216,12 +225,24 @@ const SearchConfig = () => {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((result, index) => (
                       <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                        <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                        <TableCell>{result.var}</TableCell>
-                        <TableCell>{result.name}</TableCell>
-                        <TableCell>{result.idx}</TableCell>
-                        <TableCell>{result.value}</TableCell>
-                        <TableCell>{result.attr}</TableCell>
+                        <TableCell className="table-cell">
+                          {page * rowsPerPage + index + 1}
+                        </TableCell>
+                        <TableCell className="table-cell">
+                          {result.var}
+                        </TableCell>
+                        <TableCell className="table-cell">
+                          {result.name}
+                        </TableCell>
+                        <TableCell className="table-cell">
+                          {result.idx}
+                        </TableCell>
+                        <TableCell className="table-cell">
+                          {result.value}
+                        </TableCell>
+                        <TableCell className="table-cell">
+                          {result.attr}
+                        </TableCell>
                       </TableRow>
                     ))}
                 </TableBody>
