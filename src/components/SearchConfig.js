@@ -21,7 +21,7 @@ const SearchConfig = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const xpsDatasetResponse = await fetch("/570XPS_dataset_final.json");
+      const xpsDatasetResponse = await fetch("/json/570XPS_dataset_final.json");
       const xpsDatasetData = await xpsDatasetResponse.json();
       setXpsDataset(xpsDatasetData);
 
@@ -133,7 +133,26 @@ const SearchConfig = () => {
 
   const handleFileChange = (event) => {
     if (event.target.files.length > 0) {
-      setFile(event.target.files[0]);
+      if (event.target.files[0].type === "application/json") {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+        try {
+          const xpsConfigData = JSON.parse(e.target.result);
+
+          if (!xpsConfigData.config) {
+            alert("Invalid JSON format. Missing 'config' parameter.");
+          } else {
+            setFile(event.target.files[0]);
+          }
+        } catch (error) {
+          alert("Failed to parse JSON. Please ensure the file is valid JSON.");
+        }
+      };
+      reader.readAsText(event.target.files[0]);
+   
+      } else {
+        alert("File type not supported (JSON file required)");
+      }
     }
   };
 
@@ -170,7 +189,7 @@ const SearchConfig = () => {
       </div>
       {file && (
         <p className="uploaded-file">
-          Uploaded File: {file.name} (Records: {results.length})
+          Uploaded File: {file.name} <b>(Records: {results.length})</b>
         </p>
       )}
       <div className="div-table">
@@ -192,7 +211,7 @@ const SearchConfig = () => {
                     <TableCell>Attr</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody className="table-body">
                   {results
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((result, index) => (
