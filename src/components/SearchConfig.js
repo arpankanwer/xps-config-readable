@@ -70,8 +70,8 @@ const SearchConfig = () => {
 
   const formatParamValue = (dataset, configData) => {
     return typeof dataset["value"] === "string"
-      ? dataset["value"]
-      : dataset["value"][configData["val"]] + " (" + configData["val"] + ")";
+      ? configData["val"]
+      : capitalizeFirstLetter(dataset["value"][configData["val"]] + " (" + configData["val"] + ")");
   };
 
   const processConfigData = (configData, dataset) => {
@@ -83,7 +83,7 @@ const SearchConfig = () => {
         var: configData["var"],
         name: dataset["name"],
         idx: idxDisplay,
-        value: capitalizeFirstLetter(paramValue),
+        value: paramValue,
         attr: configData["attr"],
       };
     }
