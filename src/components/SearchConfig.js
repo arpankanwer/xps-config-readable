@@ -7,7 +7,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import "../styles/SearchConfig.css"; // Import the CSS file
+import "../styles/SearchConfig.css";
 
 const SearchConfig = () => {
   const [query, setQuery] = useState("");
@@ -43,8 +43,6 @@ const SearchConfig = () => {
           });
 
           setConfigs(configList);
-          setQuery("");
-          setTimeout(handleSearch, 100);
         };
         reader.readAsText(file);
       }
@@ -52,6 +50,12 @@ const SearchConfig = () => {
 
     fetchData();
   }, [file]);
+
+  useEffect(() => {
+    if (configs.length > 0) {
+      handleSearch();
+    }
+  }, [configs]);
 
   const formatIdx = (idx) => {
     if (Array.isArray(idx)) {
@@ -145,7 +149,7 @@ const SearchConfig = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Enter variable ID or name"
+          placeholder="Enter variable ID or name (Click search for all)"
           className="search-input"
         />
         <button onClick={handleSearch} className="search-button">
@@ -165,47 +169,46 @@ const SearchConfig = () => {
       {file && (
         <p className="uploaded-file">
           Uploaded File: {file.name} (Records: {results.length})
-          {/* <div className="records-coun">
-            <span>Records: {results.length}</span>
-          </div> */}
         </p>
       )}
-      <Paper style={{ width: "100%", overflow: "hidden" }}>
-        {noData ? (
-          <div className="no-data">
-            <h2>No Data Found</h2>
-          </div>
-        ) : (
-          <TableContainer style={{ maxHeight: 440 }}>
-            <Table stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>No.</TableCell>
-                  <TableCell>Var</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Idx</TableCell>
-                  <TableCell>Value</TableCell>
-                  <TableCell>Attr</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {results
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((result, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                      <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                      <TableCell>{result.var}</TableCell>
-                      <TableCell>{result.name}</TableCell>
-                      <TableCell>{result.idx}</TableCell>
-                      <TableCell>{result.value}</TableCell>
-                      <TableCell>{result.attr}</TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Paper>
+      <div className="div-table">
+        <Paper className="paper-table-container">
+          {noData ? (
+            <div className="no-data">
+              <h2>No Data Found</h2>
+            </div>
+          ) : (
+            <TableContainer className="table-container">
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>No.</TableCell>
+                    <TableCell>Var</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Idx</TableCell>
+                    <TableCell>Value</TableCell>
+                    <TableCell>Attr</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {results
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((result, index) => (
+                      <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                        <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                        <TableCell>{result.var}</TableCell>
+                        <TableCell>{result.name}</TableCell>
+                        <TableCell>{result.idx}</TableCell>
+                        <TableCell>{result.value}</TableCell>
+                        <TableCell>{result.attr}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Paper>
+      </div>
       <div className="footer-class">
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}

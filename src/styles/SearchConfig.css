@@ -50,7 +50,7 @@
 }
 
 .uploaded-file {
-    margin-bottom: 2%;
+    margin-bottom: 1%;
 }
 
 .records-count {
@@ -61,11 +61,28 @@
     padding-top: 1%;
 }
 
+.div-table {
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-bottom: 3%;
+    /* height: max-content; */
+}
+
+.paper-table-container {
+    width: 100%;
+    overflow: hidden
+}
+
+.table-container {
+    max-height: 68vh;
+    overflow-y: auto;
+}
+
 .no-data {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 200px;
+    height: 100%;
 }
 
 .footer-class {
