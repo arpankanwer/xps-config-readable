@@ -1,70 +1,103 @@
-# Getting Started with Create React App
+# XPS Config Search
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+XPS Config Search is a web application designed to help users easily view, search, and analyze XPS (XML Paper Specification) configuration data. Users can upload a configuration file in JSON format, and the application will display the data in a structured, searchable table.
+
+## Screenshot
+
+*(Insert your screenshot of the application here. For example:)*
+```
+![XPS Config Search Screenshot](public/images/app-screenshot.png)
+```
+*The image should show the main interface, including the search bar, upload button, and the data table.*
+
+## Features
+
+*   **Upload JSON Configuration:** Easily upload XPS configuration files in `.json` format using the "Upload Config" button. The application expects a `config` array within the JSON.
+*   **Dynamic Data Loading:** Initially loads a default dataset ([`public/json/570XPS_dataset_final.json`](public/json/570XPS_dataset_final.json)) and seamlessly switches to user-uploaded data.
+*   **Comprehensive Search:**
+    *   Search by numeric variable ID (e.g., "332").
+    *   Perform case-insensitive text search by variable name (e.g., "Decoder Control").
+    *   View all configurations by leaving the search field empty and clicking "Search".
+*   **Interactive Tabular Display:**
+    *   Presents configuration data in a clear, paginated table with columns: No., Var, Name, Idx, Value, and Attr.
+    *   The `Idx` and `Value` fields are formatted for readability using [`formatIdx`](src/components/SearchConfig.js) and [`formatParamValue`](src/components/SearchConfig.js).
+*   **File Information:** Displays the name of the currently loaded configuration file and the total number of records.
+*   **User Feedback:** Provides alerts for invalid JSON format, missing 'config' parameter, or unsupported file types. Shows a "No Data Found" message if search yields no results.
+*   **Responsive Interface:** The layout adapts to different screen sizes, with the table content being scrollable.
+
+## Getting Started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+*   Node.js and npm (or yarn) installed.
+
+### Installation
+
+1.  Clone the repository or download the project files.
+2.  Navigate to the project directory:
+    ```sh
+    cd your-project-directory
+    ```
+3.  Install the dependencies:
+    ```sh
+    npm install
+    ```
+    or if you use yarn:
+    ```sh
+    yarn install
+    ```
+
+### Running the Application
+
+To run the app in development mode:
+
+```sh
+npm start
+```
+
+This will open the application in your browser at [http://localhost:3000](http://localhost:3000). The page will reload if you make edits.
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+*   `npm start`: Runs the app in development mode.
+*   `npm test`: Launches the test runner in interactive watch mode.
+*   `npm run build`: Builds the app for production to the `build` folder.
+*   `npm run eject`: Removes the single build dependency and copies configuration files and dependencies into your project. **Note: this is a one-way operation.**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## How It Works
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The core functionality is handled by the [`SearchConfig`](src/components/SearchConfig.js) component:
 
-### `npm test`
+1.  **File Upload (`handleFileChange`):**
+    *   When a user selects a JSON file, the [`handleFileChange`](src/components/SearchConfig.js) function is triggered.
+    *   It uses `FileReader` to read the file content.
+    *   It parses the JSON and validates that a `config` key exists.
+    *   The uploaded file information is stored in the component's state.
+2.  **Search (`handleSearch`):**
+    *   Users can input a variable ID or name into the search field.
+    *   The [`handleSearch`](src/components/SearchConfig.js) function filters the data from the uploaded JSON.
+    *   If the query is empty, all data is shown.
+    *   If the query is a number, it matches against the `var` field.
+    *   If the query is text, it performs a case-insensitive search against the `name` field in the dataset.
+3.  **Display:**
+    *   Results are displayed in a paginated table using Material-UI components.
+    *   The number of records and uploaded file name are shown.
+    *   If no data matches the search, a "No Data Found" message is displayed.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The main application component is [`App.js`](src/App.js), which renders the [`SearchConfig`](src/components/SearchConfig.js) component. The application's entry point is [`src/index.js`](src/index.js). Styles are primarily managed in [`src/styles/SearchConfig.css`](src/styles/SearchConfig.css) and [`src/App.css`](src/App.css). An example dataset can be found at [`public/json/570XPS_dataset_final.json`](public/json/570XPS_dataset_final.json).
 
-### `npm run build`
+## Building for Production
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To build the app for production:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```sh
+npm run build
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This bundles React in production mode and optimizes the build for the best performance. The build artifacts will be stored in the `build/` directory.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+For more information on Create React App, see the
