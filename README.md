@@ -4,9 +4,8 @@ XPS Config Search is a web application designed to help users easily view, searc
 
 ## Screenshot
 
-```
 ![XPS Config Search Screenshot](public/images/app-screenshot.png)
-```
+
 *The image should show the main interface, including the search bar, upload button, and the data table.*
 
 ## Features
