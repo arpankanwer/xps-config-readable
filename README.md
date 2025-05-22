@@ -4,7 +4,6 @@ XPS Config Search is a web application designed to help users easily view, searc
 
 ## Screenshot
 
-*(Insert your screenshot of the application here. For example:)*
 ```
 ![XPS Config Search Screenshot](public/images/app-screenshot.png)
 ```
@@ -13,7 +12,7 @@ XPS Config Search is a web application designed to help users easily view, searc
 ## Features
 
 *   **Upload JSON Configuration:** Easily upload XPS configuration files in `.json` format using the "Upload Config" button. The application expects a `config` array within the JSON.
-*   **Dynamic Data Loading:** Initially loads a default dataset ([`public/json/570XPS_dataset_final.json`](public/json/570XPS_dataset_final.json)) and seamlessly switches to user-uploaded data.
+*   **Dynamic Data Loading:** Initially loads a default dataset and seamlessly switches to user-uploaded data.
 *   **Comprehensive Search:**
     *   Search by numeric variable ID (e.g., "332").
     *   Perform case-insensitive text search by variable name (e.g., "Decoder Control").
